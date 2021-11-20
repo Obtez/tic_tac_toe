@@ -1,1 +1,132 @@
-/* No CSS *//*# sourceMappingURL=main.css.map */
+* {
+  margin: 0;
+  padding: 0;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+body {
+  padding: 1.5rem 25vw;
+}
+
+.form {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+.form label {
+  margin-bottom: 0.5rem;
+}
+
+.form input {
+  padding: 0.2rem 0.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.form__player-x {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  border: none;
+}
+
+.form__player-x__span {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: red;
+}
+
+.form__player-o {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  border: none;
+}
+
+.form__player-o__span {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: blue;
+}
+
+.form__buttons {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  border: none;
+}
+
+.form__buttons input {
+  padding: 0.2rem 0.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.board {
+  padding: 1.5rem 10vw;
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-columns: (1fr)[3];
+      grid-template-columns: repeat(3, 1fr);
+}
+
+.board__play-field {
+  height: 10vw;
+  width: 10vw;
+  cursor: pointer;
+}
+
+.board .top-left {
+  border-right: 2px solid black;
+  border-bottom: 2px solid black;
+}
+
+.board .top-center {
+  border-bottom: 2px solid black;
+}
+
+.board .top-right {
+  border-left: 2px solid black;
+  border-bottom: 2px solid black;
+}
+
+.board .middle-left {
+  border-right: 2px solid black;
+}
+
+.board .middle-right {
+  border-left: 2px solid black;
+}
+
+.board .bottom-left {
+  border-right: 2px solid black;
+  border-top: 2px solid black;
+}
+
+.board .bottom-center {
+  border-top: 2px solid black;
+}
+
+.board .bottom-right {
+  border-left: 2px solid black;
+  border-top: 2px solid black;
+}
+/*# sourceMappingURL=main.css.map */

@@ -12,6 +12,39 @@
 
 <body>
 
+  <form class="form">
+    <fieldset class="form__player-x">
+      <label for="input-x">Player ╳: <span class="form__player-x__span"></span></label>
+      <input class="form__player-x__input" type="text" name="input-x" id="input-x" placeholder="type your name">
+
+    </fieldset>
+
+    <fieldset class="form__player-o">
+      <label for="input-o">Player ◯: <span class="form__player-o__span"></span></label>
+      <input class="form__player-o__input" type="text" name="input-o" id="input-o" placeholder="type your name">
+    </fieldset>
+
+    <fieldset class="form__buttons">
+      <input class="form__buttons__start" type="submit" value="Start">
+      <input class="form__buttons__restart" type="submit" value="Restart">
+    </fieldset>
+  </form>
+
+  <p class="turn">Turn of: <span class="turn__span"></span></p>
+
+  <main class="board">
+    <div class="board__play-field top-left"></div>
+    <div class="board__play-field top-center"></div>
+    <div class="board__play-field top-right"></div>
+    <div class="board__play-field middle-left"></div>
+    <div class="board__play-field middle-center"></div>
+    <div class="board__play-field middle-right"></div>
+    <div class="board__play-field bottom-left"></div>
+    <div class="board__play-field bottom-center"></div>
+    <div class="board__play-field bottom-right"></div>
+
+  </main>
+
 </body>
 
 </html>

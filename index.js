@@ -1,35 +1,48 @@
 const game = (function() {
 	const startButton = document.querySelector('.form__buttons__start');
+	const restartButton = document.querySelector('.form__buttons__restart');
 
 	let playerX;
 	let playerO;
 
-	startButton.addEventListener('click', setup);
+	startButton.addEventListener('click', setupGame);
+	restartButton.addEventListener('click', restartGame);
 
-	function setup() {
+	function setupGame() {
 		if (formField.checkNames() === false) {
 			alert('Please type both players names');
 		} else {
-			playerX = createPlayers(formField.setNamePlates().playerXName, 'x');
-			playerO = createPlayers(formField.setNamePlates().playerOName, 'o');
+			playerX = createPlayers(formField.setNamePlates().playerXName, '╳');
+			playerO = createPlayers(formField.setNamePlates().playerOName, '◯');
 			formField.setNamePlates();
-			formField.setTurn(playerX, playerO);
+			formField.setFirstTurn(playerX);
 			formField.emptyInputFields();
 		}
 	}
 
-	function run(id) {
+	function runGame(id) {
 		if (formField.checkNames() !== 'game set') {
 			alert('Please first type both players names and press "Start"');
+		} else if (gameBoard.checkIfFilled(id) === 'already checked') {
+			return;
 		} else {
 			gameBoard.makeMove(id, playerX, playerO);
 			gameBoard.setGameFieldTextContent();
-			formField.setTurn(playerX, playerO);
+			gameBoard.checkIfWin(playerX, playerO);
+			gameBoard.checkIfTie();
 		}
 	}
 
+	function restartGame() {
+		gameBoard.cleanGameArray();
+		gameBoard.cleanGameField();
+		formField.cleanFormField();
+		formField.setFirstTurn(playerX);
+	}
+
 	return {
-		run,
+		runGame,
+		restartGame,
 	};
 })();
 
@@ -53,7 +66,7 @@ const formField = (function() {
 	});
 
 	function checkNames() {
-		if (_playerXInput.value && _playerOInput.value) {
+		if (_playerXInput.value.trim() && _playerOInput.value.trim()) {
 			return true;
 		} else if (turnSpan.textContent !== '') {
 			return 'game set';
@@ -70,11 +83,16 @@ const formField = (function() {
 		return { playerXName, playerOName };
 	}
 
+	function setFirstTurn(playerX) {
+		if (turnSpan.classList.contains('form__player-o__span')) {
+			turnSpan.classList.remove('form__player-o__span');
+		}
+		turnSpan.textContent = playerX.name;
+		turnSpan.classList.add('form__player-x__span');
+	}
+
 	function setTurn(playerX, playerO) {
-		if (turnSpan.textContent === '') {
-			turnSpan.textContent = playerX.name;
-			turnSpan.classList.add('form__player-x__span');
-		} else if (turnSpan.textContent === playerX.name) {
+		if (turnSpan.textContent === playerX.name) {
 			turnSpan.classList.remove('form__player-x__span');
 			turnSpan.textContent = playerO.name;
 			turnSpan.classList.add('form__player-o__span');
@@ -87,9 +105,9 @@ const formField = (function() {
 
 	function exposeCurrentPlayer(playerX, playerO) {
 		let currentPlayer;
-		if ((turnSpan.textContent = playerX.name)) {
+		if (turnSpan.textContent === playerX.name) {
 			currentPlayer = playerX;
-		} else if ((turnSpan.textContent = playerO.name)) {
+		} else if (turnSpan.textContent === playerO.name) {
 			currentPlayer = playerO;
 		}
 
@@ -101,12 +119,18 @@ const formField = (function() {
 		_playerOInput.value = '';
 	}
 
+	function cleanFormField() {
+		emptyInputFields();
+	}
+
 	return {
 		checkNames,
 		setNamePlates,
+		setFirstTurn,
 		setTurn,
 		emptyInputFields,
 		exposeCurrentPlayer,
+		cleanFormField,
 	};
 })();
 
@@ -116,6 +140,7 @@ const gameBoard = (function() {
 		[ { sign: '', id: 'mlf' }, { sign: '', id: 'mcf' }, { sign: '', id: 'mrf' } ],
 		[ { sign: '', id: 'blf' }, { sign: '', id: 'bcf' }, { sign: '', id: 'brf' } ],
 	];
+
 	const topLeftField = document.querySelector('.top-left');
 	const topCenterField = document.querySelector('.top-center');
 	const topRightField = document.querySelector('.top-right');
@@ -127,32 +152,41 @@ const gameBoard = (function() {
 	const bottomRightField = document.querySelector('.bottom-right');
 
 	topLeftField.addEventListener('click', () => {
-		game.run('tlf');
+		game.runGame('tlf');
 	});
 	topCenterField.addEventListener('click', () => {
-		game.run('tcf');
+		game.runGame('tcf');
 	});
 	topRightField.addEventListener('click', () => {
-		game.run('trf');
+		game.runGame('trf');
 	});
 	middleLeftField.addEventListener('click', () => {
-		game.run('mlf');
+		game.runGame('mlf');
 	});
 	middleCenterField.addEventListener('click', () => {
-		game.run('mcf');
+		game.runGame('mcf');
 	});
 	middleRightField.addEventListener('click', () => {
-		game.run('mrf');
+		game.runGame('mrf');
 	});
 	bottomLeftField.addEventListener('click', () => {
-		game.run('blf');
+		game.runGame('blf');
 	});
 	bottomCenterField.addEventListener('click', () => {
-		game.run('bcf');
+		game.runGame('bcf');
 	});
 	bottomRightField.addEventListener('click', () => {
-		game.run('brf');
+		game.runGame('brf');
 	});
+
+	function checkIfFilled(id) {
+		for (let i = 0; i < gameArray.length; i++) {
+			const index = gameArray[i].findIndex(field => field.id === id);
+			if (index !== -1 && gameArray[i][index].sign !== '') {
+				return 'already checked';
+			}
+		}
+	}
 
 	function makeMove(id, playerX, playerO) {
 		let filteredArray;
@@ -167,7 +201,6 @@ const gameBoard = (function() {
 		} else if (formField.exposeCurrentPlayer(playerX, playerO).currentPlayer === playerO) {
 			filteredArray.sign = '◯';
 		}
-		console.log(gameArray);
 	}
 
 	function setGameFieldTextContent() {
@@ -182,89 +215,86 @@ const gameBoard = (function() {
 		bottomRightField.textContent = gameArray[2][2].sign;
 	}
 
+	function checkIfWin(playerX, playerO) {
+		const winConditions = [
+			[ gameArray[0][0].sign, gameArray[0][1].sign, gameArray[0][2].sign ],
+			[ gameArray[1][0].sign, gameArray[1][1].sign, gameArray[1][2].sign ],
+			[ gameArray[2][0].sign, gameArray[2][1].sign, gameArray[2][2].sign ],
+			[ gameArray[0][0].sign, gameArray[1][1].sign, gameArray[2][2].sign ],
+			[ gameArray[0][2].sign, gameArray[1][1].sign, gameArray[2][0].sign ],
+			[ gameArray[0][0].sign, gameArray[1][0].sign, gameArray[2][0].sign ],
+			[ gameArray[0][1].sign, gameArray[1][1].sign, gameArray[2][1].sign ],
+			[ gameArray[0][2].sign, gameArray[1][2].sign, gameArray[2][2].sign ],
+		];
+
+		const win = winConditions.some(
+			array => array[0] !== '' && array[1] !== '' && array[2] !== '' && array[0] === array[1] && array[0] === array[2]
+		);
+
+		if (win) {
+			const winner = formField.exposeCurrentPlayer(playerX, playerO).currentPlayer;
+			setTimeout(() => {
+				congratulateWinner(winner);
+			}, 10);
+		} else {
+			formField.setTurn(playerX, playerO);
+		}
+	}
+
+	function congratulateWinner(winner) {
+		alert(`${winner.name} won! Congratulations!`);
+		game.restartGame();
+	}
+
+	function checkIfTie() {
+		const flattenedArray = gameArray.flat();
+		const emptyFields = flattenedArray.filter(field => field.sign === '');
+		setTimeout(() => {
+			if (emptyFields.length === 0) {
+				alert('TIE');
+				game.restartGame();
+			}
+		});
+
+		// for (let i = 0; i < gameArray.length; i++) {
+		// 	const emptyFields = gameArray[i].find(field => field.sign === '');
+		// 	console.log(emptyFields);
+		// 	if (!emptyFields) {
+		// 		alert('it is Tie!');
+		// 	}
+		// if (index !== -1) {
+		//   filteredArray = gameArray[i][index];
+		// }
+		// }
+	}
+
+	function cleanGameArray() {
+		gameArray = [
+			[ { sign: '', id: 'tlf' }, { sign: '', id: 'tcf' }, { sign: '', id: 'trf' } ],
+			[ { sign: '', id: 'mlf' }, { sign: '', id: 'mcf' }, { sign: '', id: 'mrf' } ],
+			[ { sign: '', id: 'blf' }, { sign: '', id: 'bcf' }, { sign: '', id: 'brf' } ],
+		];
+	}
+
+	function cleanGameField() {
+		topLeftField.textContent = '';
+		topCenterField.textContent = '';
+		topRightField.textContent = '';
+		middleLeftField.textContent = '';
+		middleCenterField.textContent = '';
+		middleRightField.textContent = '';
+		bottomLeftField.textContent = '';
+		bottomCenterField.textContent = '';
+		bottomRightField.textContent = '';
+	}
+
 	return {
+		checkIfFilled,
 		makeMove,
 		setGameFieldTextContent,
+		checkIfWin,
+		checkIfTie,
+		cleanGameArray,
+		cleanGameField,
 	};
 })();
-
-// const form = (function() {
-// 	const _playersForm = document.querySelector('.form');
-// 	const _playerXInput = document.querySelector('.form__player-x__input');
-// 	const _playerOInput = document.querySelector('.form__player-o__input');
-// const playerXNamePlate = document.querySelector('.form__player-x__span');
-// const playerONamePlate = document.querySelector('.form__player-o__span');
-// 	const startButton = document.querySelector('.form__buttons__start');
-// 	const restartButton = document.querySelector('.form__buttons__restart');
-
-// 	//EVENT LISTENERS
-// 	_playerXInput.addEventListener('keyup', () => {
-// 		let _playerXName = _playerXInput.value;
-// 		_setNamePlate(_playerXName, playerXNamePlate);
-// 	});
-
-// 	_playerOInput.addEventListener('keyup', () => {
-// 		let _playerOName = _playerOInput.value;
-// 		_setNamePlate(_playerOName, playerONamePlate);
-// 	});
-
-// 	_playersForm.addEventListener('submit', e => {
-// 		e.preventDefault();
-// 	});
-
-// 	startButton.addEventListener('click', createPlayer);
-// 	startButton.addEventListener('click', _emptyInputFields);
-
-// 	//FUNCTIONS
-// 	function _setNamePlate(name, namePlate) {
-// 		namePlate.textContent = name.toUpperCase();
-// 	}
-
-// 	function _emptyInputFields() {
-// 		_playerXInput.value = '';
-// 		_playerOInput.value = '';
-// 	}
-
-// 	return {
-// 		playerXNamePlate,
-// 		playerONamePlate,
-// 		startButton,
-// 	};
-// })();
-
-// function createPlayer() {
-// 	let playerXFinalName = form.playerXNamePlate.textContent;
-// 	let playerOFinalName = form.playerONamePlate.textContent;
-// 	const playerXSign = 'x';
-// 	const playerOSign = 'o';
-
-// 	// DELETE
-// 	const turnSpan = document.querySelector('.turn__span');
-
-// 	turnSpan.textContent = playerXFinalName;
-
-// 	//
-
-// 	return [ { name: playerXFinalName, sign: playerXSign }, { name: playerOSign, sign: playerOSign } ];
-// }
-
-// const turn = function() {
-// 	const turnSpan = document.querySelector('.turn__span');
-
-// 	function setTurn() {
-// 		turnSpan.textContent = createPlayer()[0];
-// 	}
-// };
-
-// const gameBoardContainer = (function() {
-// let gameBoard = [ [ '', '', '' ], [ '', '', '' ], [ '', '', '' ] ];
-// const topLeftField = document.querySelector('.top-left');
-// const topCenterField = document.querySelector('.top-center');
-// const topRightField = document.querySelector('.top-right');
-// const middleLeftField = document.querySelector('.middle-left');
-// const middleCenterField = document.querySelector('.middle-center');
-// const middleRightField = document.querySelector('.middle-right');
-// const bottomLeftField = document.querySelector('.bottom-left');
-// const bottomCenterField = document.querySelector('.bottom-center');
-// const bottomRightField = document.querySelector('.bottom-right');
-// })();

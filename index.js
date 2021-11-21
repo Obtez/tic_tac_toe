@@ -1,14 +1,17 @@
 const game = (function() {
 	const startButton = document.querySelector('.form__buttons__start');
 
+	let playerX;
+	let playerO;
+
 	startButton.addEventListener('click', setup);
 
 	function setup() {
 		if (formField.checkNames() === false) {
 			alert('Please type both players names');
 		} else {
-			let playerX = createPlayers(formField.setNamePlates().playerXName, 'x');
-			let playerO = createPlayers(formField.setNamePlates().playerOName, 'o');
+			playerX = createPlayers(formField.setNamePlates().playerXName, 'x');
+			playerO = createPlayers(formField.setNamePlates().playerOName, 'o');
 			formField.setNamePlates();
 			formField.setTurn(playerX, playerO);
 			formField.emptyInputFields();
@@ -19,7 +22,9 @@ const game = (function() {
 		if (formField.checkNames() !== 'game set') {
 			alert('Please first type both players names and press "Start"');
 		} else {
-			gameBoard.makeMove(id);
+			gameBoard.makeMove(id, playerX, playerO);
+			gameBoard.setGameFieldTextContent();
+			formField.setTurn(playerX, playerO);
 		}
 	}
 
@@ -66,22 +71,28 @@ const formField = (function() {
 	}
 
 	function setTurn(playerX, playerO) {
-		let currentPlayer;
 		if (turnSpan.textContent === '') {
 			turnSpan.textContent = playerX.name;
 			turnSpan.classList.add('form__player-x__span');
-			currentPlayer = playerX;
 		} else if (turnSpan.textContent === playerX.name) {
 			turnSpan.classList.remove('form__player-x__span');
 			turnSpan.textContent = playerO.name;
 			turnSpan.classList.add('form__player-o__span');
-			currentPlayer = playerO;
 		} else if (turnSpan.textContent === playerO.name) {
 			turnSpan.classList.remove('form__player-o__span');
 			turnSpan.textContent = playerX.name;
 			turnSpan.classList.add('form__player-x__span');
-			currentPlayer = playerX;
 		}
+	}
+
+	function exposeCurrentPlayer(playerX, playerO) {
+		let currentPlayer;
+		if ((turnSpan.textContent = playerX.name)) {
+			currentPlayer = playerX;
+		} else if ((turnSpan.textContent = playerO.name)) {
+			currentPlayer = playerO;
+		}
+
 		return { currentPlayer };
 	}
 
@@ -95,6 +106,7 @@ const formField = (function() {
 		setNamePlates,
 		setTurn,
 		emptyInputFields,
+		exposeCurrentPlayer,
 	};
 })();
 
@@ -113,7 +125,6 @@ const gameBoard = (function() {
 	const bottomLeftField = document.querySelector('.bottom-left');
 	const bottomCenterField = document.querySelector('.bottom-center');
 	const bottomRightField = document.querySelector('.bottom-right');
-	let id;
 
 	topLeftField.addEventListener('click', () => {
 		game.run('tlf');
@@ -143,6 +154,22 @@ const gameBoard = (function() {
 		game.run('brf');
 	});
 
+	function makeMove(id, playerX, playerO) {
+		let filteredArray;
+		for (let i = 0; i < gameArray.length; i++) {
+			const index = gameArray[i].findIndex(field => field.id === id);
+			if (index !== -1) {
+				filteredArray = gameArray[i][index];
+			}
+		}
+		if (formField.exposeCurrentPlayer(playerX, playerO).currentPlayer === playerX) {
+			filteredArray.sign = '╳';
+		} else if (formField.exposeCurrentPlayer(playerX, playerO).currentPlayer === playerO) {
+			filteredArray.sign = '◯';
+		}
+		console.log(gameArray);
+	}
+
 	function setGameFieldTextContent() {
 		topLeftField.textContent = gameArray[0][0].sign;
 		topCenterField.textContent = gameArray[0][1].sign;
@@ -155,21 +182,9 @@ const gameBoard = (function() {
 		bottomRightField.textContent = gameArray[2][2].sign;
 	}
 
-	function makeMove(id) {
-		let filteredArray;
-		for (let i = 0; i < gameArray.length; i++) {
-			const index = gameArray[i].findIndex(field => field.id === id);
-			if (index !== -1) {
-				filteredArray = gameArray[i][index];
-			}
-		}
-		if (formField.setTurn().currentPlayer === playerX) {
-			console.log('hi');
-		}
-	}
-
 	return {
 		makeMove,
+		setGameFieldTextContent,
 	};
 })();
 

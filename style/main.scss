@@ -30,6 +30,9 @@ body {
 			font-size: 1.2rem;
 			color: red;
 		}
+
+		.turn {
+		}
 	}
 
 	&__player-o {
@@ -66,6 +69,10 @@ body {
 		height: 10vw;
 		width: 10vw;
 		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 4rem;
 	}
 
 	.top-left {

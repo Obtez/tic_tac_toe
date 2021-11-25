@@ -255,17 +255,6 @@ const gameBoard = (function() {
 				game.restartGame();
 			}
 		});
-
-		// for (let i = 0; i < gameArray.length; i++) {
-		// 	const emptyFields = gameArray[i].find(field => field.sign === '');
-		// 	console.log(emptyFields);
-		// 	if (!emptyFields) {
-		// 		alert('it is Tie!');
-		// 	}
-		// if (index !== -1) {
-		//   filteredArray = gameArray[i][index];
-		// }
-		// }
 	}
 
 	function cleanGameArray() {
